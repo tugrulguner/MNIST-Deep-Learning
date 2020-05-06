@@ -5,7 +5,7 @@ import tensorflow as tf
 from tensorflow import keras
 
 
-train = pd.read_csv('/kaggle/input/digit-recognizer/train.csv') #It works fine in kaggle notebook in this form
+train = pd.read_csv('/kaggle/input/digit-recognizer/train.csv')
 train = train.reindex(np.random.permutation(train.index))
 label = train.label.values
 train.drop(['label'], axis = 1, inplace = True)
@@ -14,17 +14,28 @@ X_train = X_train.values.reshape(len(X_train),28,28,1)
 
 model = keras.Sequential([
       tf.keras.layers.Conv2D(32, 3, activation='relu', padding='same'),
-      tf.keras.layers.Conv2D(64, 3, activation='relu', padding='same'),
-      tf.keras.layers.MaxPooling2D(),
-      tf.keras.layers.Conv2D(64, 3, activation='relu', padding='same'),
-      tf.keras.layers.MaxPooling2D(),
       tf.keras.layers.Conv2D(32, 3, activation='relu', padding='same'),
       tf.keras.layers.MaxPooling2D(),
+      tf.keras.layers.Conv2D(64, 4, activation='relu', padding='same'),
+      tf.keras.layers.Conv2D(64, 4, activation='relu', padding='same'),
+      tf.keras.layers.MaxPooling2D(),
       tf.keras.layers.Flatten(),
-      tf.keras.layers.Dense(256, activation='sigmoid'),
+      tf.keras.layers.Dense(128, activation='relu'),
       tf.keras.layers.Dense(64, activation='sigmoid'),
       tf.keras.layers.Dense(10),
 ])
+
+
+early_stopping_monitor = EarlyStopping(patience=3)
+model.compile(optimizer='adam',
+                loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
+                metrics=['accuracy'])
+
+history = model.fit(X_train, label, validation_split = 0.2, batch_size = 30, epochs = 20, callbacks=[early_stopping_monitor])
+plt.plot(history.history['loss'])
+plt.plot(history.history['val_loss'])
+plt.show()
+    
 
 
 model.compile(optimizer='adam',
