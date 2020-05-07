@@ -14,24 +14,29 @@ X_train = X_train.values.reshape(len(X_train),28,28,1)
 
 model = keras.Sequential([
       tf.keras.layers.Conv2D(32, 3, activation='relu', padding='same'),
+      tf.keras.layers.Dropout(0.3),
       tf.keras.layers.Conv2D(32, 3, activation='relu', padding='same'),
       tf.keras.layers.MaxPooling2D(),
+      tf.keras.layers.Dropout(0.3),
       tf.keras.layers.Conv2D(64, 4, activation='relu', padding='same'),
       tf.keras.layers.Conv2D(64, 4, activation='relu', padding='same'),
       tf.keras.layers.MaxPooling2D(),
       tf.keras.layers.Flatten(),
+      tf.keras.layers.BatchNormalization(),
+      tf.keras.layers.Dropout(0.5),
       tf.keras.layers.Dense(128, activation='relu'),
-      tf.keras.layers.Dense(64, activation='sigmoid'),
+      tf.keras.layers.Dropout(0.5),
+      tf.keras.layers.Dense(128, activation='relu'),
       tf.keras.layers.Dense(10),
 ])
 
 
-early_stopping_monitor = EarlyStopping(patience=3)
-model.compile(optimizer='adam',
+early_stopping_monitor = EarlyStopping(patience=3, restore_best_weights=True)
+model.compile(optimizer='nadam',
                 loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
                 metrics=['accuracy'])
 
-history = model.fit(X_train, label, validation_split = 0.2, batch_size = 30, epochs = 20, callbacks=[early_stopping_monitor])
+history = model.fit(X_train, label, validation_split = 0.2, batch_size = 30, epochs = 40, callbacks=[early_stopping_monitor])
 plt.plot(history.history['loss'])
 plt.plot(history.history['val_loss'])
 plt.show()
