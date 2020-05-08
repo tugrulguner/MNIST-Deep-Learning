@@ -11,9 +11,9 @@ label = train.label.values
 train.drop(['label'], axis = 1, inplace = True)
 X_train = train/255
 X_train = X_train.values.reshape(len(X_train),28,28,1)
-
+initializer = tf.keras.initializers.TruncatedNormal()
 model = keras.Sequential([
-      tf.keras.layers.Conv2D(32, 3, activation='relu', padding='same'),
+      tf.keras.layers.Conv2D(32, 3, activation='relu', padding='same', kernel_initializer=initializer, bias_initializer=initializers.Zeros()),
       tf.keras.layers.Dropout(0.3),
       tf.keras.layers.Conv2D(32, 3, activation='relu', padding='same'),
       tf.keras.layers.MaxPooling2D(),
@@ -32,7 +32,7 @@ model = keras.Sequential([
 
 
 early_stopping_monitor = EarlyStopping(patience=3, restore_best_weights=True)
-model.compile(optimizer='nadam',
+model.compile(optimizer='adam',
                 loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
                 metrics=['accuracy'])
 
@@ -41,7 +41,6 @@ plt.plot(history.history['loss'])
 plt.plot(history.history['val_loss'])
 plt.show()
     
-
 
 model.compile(optimizer='adam',
                 loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
@@ -52,7 +51,11 @@ plt.plot(history.history['loss'])
 plt.plot(history.history['val_loss'])
 plt.show()
     
+dot_img_file = '/kaggle/working/model_1.png'
+tf.keras.utils.plot_model(model, to_file=dot_img_file, show_shapes=True)
 
+model.summary()
+      
 test = pd.read_csv('/kaggle/input/digit-recognizer/test.csv')
 test = test/255
 test = test.values.reshape(len(test),28,28,1)
