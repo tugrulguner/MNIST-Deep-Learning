@@ -41,15 +41,6 @@ plt.plot(history.history['loss'])
 plt.plot(history.history['val_loss'])
 plt.show()
     
-
-model.compile(optimizer='adam',
-                loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
-                metrics=['accuracy'])
-
-history = model.fit(X_train, label, validation_split = 0.1, batch_size = 30, epochs = 100)
-plt.plot(history.history['loss'])
-plt.plot(history.history['val_loss'])
-plt.show()
     
 dot_img_file = '/kaggle/working/model_1.png'
 tf.keras.utils.plot_model(model, to_file=dot_img_file, show_shapes=True)
